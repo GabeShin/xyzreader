@@ -10,6 +10,8 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.SyncStateContract;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.RecyclerView;
@@ -21,12 +23,16 @@ import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * An activity representing a list of Articles. This activity has different presentations for
@@ -40,6 +46,7 @@ public class ArticleListActivity extends ActionBarActivity implements
     private Toolbar mToolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
+    private Bundle mReenterState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,13 +143,15 @@ public class ArticleListActivity extends ActionBarActivity implements
                 public void onClick(View view) {
                     Intent intent = new Intent(Intent.ACTION_VIEW,
                             ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
-                    startActivity(intent);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+
+                        String transitionName = "transition_name_" + getItemId(vh.getAdapterPosition());
+
                         Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
                                 ArticleListActivity.this,
                                 vh.thumbnailView,
-                                vh.thumbnailView.getTransitionName())
+                                transitionName)
                                 .toBundle();
                         startActivity(intent, bundle);
                     } else {
@@ -158,6 +167,7 @@ public class ArticleListActivity extends ActionBarActivity implements
         public void onBindViewHolder(ViewHolder holder, int position) {
             mCursor.moveToPosition(position);
             holder.titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+
             holder.subtitleView.setText(
                     DateUtils.getRelativeTimeSpanString(
                             mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
@@ -169,13 +179,6 @@ public class ArticleListActivity extends ActionBarActivity implements
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
                     ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                String transitionName = "transition_name_" + getItemId(position);
-                Log.v("LOG_TAG", "transition name from List is " + transitionName);
-                holder.thumbnailView.setTransitionName(transitionName);
-            }
-
         }
 
         @Override
@@ -195,5 +198,36 @@ public class ArticleListActivity extends ActionBarActivity implements
             titleView = (TextView) view.findViewById(R.id.article_title);
             subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
         }
+    }
+
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+
+        mReenterState = new Bundle(data.getExtras());
+        int itemId = mReenterState.getInt(ArticleDetailFragment.ARG_ITEM_ID);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Postpone the shared element return transition.
+            postponeEnterTransition();
+        }
+        // TODO: Call the "scheduleStartPostponedTransition()" method
+        // above when you know for certain that the shared element is
+        // ready for the transition to begin.
+    }
+
+
+    private void scheduleStartPostponedTransition(final View sharedElement) {
+        // attaching listener to the shared element
+        sharedElement.getViewTreeObserver().addOnPreDrawListener(
+                new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        sharedElement.getViewTreeObserver().removeOnPreDrawListener(this);
+                        startPostponedEnterTransition();
+                        return true;
+                    }
+                }
+        );
     }
 }

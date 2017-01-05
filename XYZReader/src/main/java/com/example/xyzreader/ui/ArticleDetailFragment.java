@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -131,8 +132,7 @@ public class ArticleDetailFragment extends Fragment implements
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             String transitionName = "transition_name_" + mItemId;
-            Log.v("LOG_TAG", "transition name from DETAIL is " + transitionName);
-
+            Log.v("LOG_TAG_TEST", "transition name from DETAIL is " + transitionName);
             mPhotoView.setTransitionName(transitionName);
         }
 
@@ -220,12 +220,6 @@ public class ArticleDetailFragment extends Fragment implements
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
-
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-                                    Log.v("LOG_TAG_TEST", "start the postponed enter transition");
-                                    ActivityCompat.startPostponedEnterTransition(getActivity());
-                                }
                                 updateStatusBar();
                             }
                         }
@@ -235,6 +229,12 @@ public class ArticleDetailFragment extends Fragment implements
 
                         }
                     });
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Log.v("LOG_TAG_TEST", "start the postponed enter transition");
+                scheduleStartPostponedTransition(mPhotoView);
+            }
+
         } else {
             mRootView.setVisibility(View.GONE);
             titleView.setText("N/A");
@@ -281,5 +281,18 @@ public class ArticleDetailFragment extends Fragment implements
         return mIsCard
                 ? (int) mPhotoContainerView.getTranslationY() + mPhotoView.getHeight() - mScrollY
                 : mPhotoView.getHeight() - mScrollY;
+    }
+
+    private void scheduleStartPostponedTransition(final View sharedElement) {
+        // attaching listener to the shared element
+        sharedElement.getViewTreeObserver().addOnPreDrawListener(
+                new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        sharedElement.getViewTreeObserver().removeOnPreDrawListener(this);
+                        getActivity().startPostponedEnterTransition();
+                        return true;
+                    }
+                });
     }
 }
