@@ -197,6 +197,7 @@ public class ArticleListActivity extends ActionBarActivity implements
 
         public ViewHolder(View view) {
             super(view);
+            view.setOnClickListener(this);
             thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
             titleView = (TextView) view.findViewById(R.id.article_title);
             subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
@@ -224,10 +225,7 @@ public class ArticleListActivity extends ActionBarActivity implements
         @Override
         public void onClick(View view) {
 
-            Toast.makeText(ArticleListActivity.this, "CLICKED", Toast.LENGTH_LONG).show();
-
-//            Intent intent = new Intent(Intent.ACTION_VIEW, ItemsContract.Items.buildItemUri(mItemPosition));
-            Intent intent = new Intent(ArticleListActivity.this, ArticleDetailActivity.class);
+            Intent intent = new Intent(Intent.ACTION_VIEW, ItemsContract.Items.buildItemUri(mItemPosition));
 
             intent.putExtra(EXTRA_STARTING_POSITION, mItemPosition);
 
@@ -250,7 +248,6 @@ public class ArticleListActivity extends ActionBarActivity implements
 
     @Override
     public void onActivityReenter(int resultCode, Intent data) {
-        super.onActivityReenter(resultCode, data);
 
         super.onActivityReenter(resultCode, data);
         mReenterState = new Bundle(data.getExtras());

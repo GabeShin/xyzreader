@@ -4,35 +4,38 @@
     api-level="23"
     density="xxxhdpi"
     format="7"
-    timestamp="429382969160755"
-    token="5419343556038719251" >
+    timestamp="443866441596973"
+    token="5419343556038719251"
+    verifier="COMPATIBLE" >
 
     <task
         name="javac"
-        duration="670" />
+        duration="835" />
     <task
         name="instant-run-dex"
-        duration="0" />
+        duration="476" />
     <task
         name="instant-run-transform"
-        duration="43" />
+        duration="55" />
     <task
         name="verifier"
-        duration="7" />
+        duration="9" />
 
     <artifact
-        location="C:\Users\Gabe\Desktop\App Projects\xyzreader\XYZReader\build\intermediates\transforms\dex\debug\folders\1000\5\slice_1\classes.dex"
-        type="DEX" />
+        location="C:\Users\Gabe\Desktop\App Projects\xyzreader\XYZReader\build\intermediates\reload-dex\debug\classes.dex"
+        type="RELOAD_DEX" />
 
-    <build timestamp="427674401022643" >
+    <build timestamp="443756673508381" >
         <artifact
             location="C:\Users\Gabe\Desktop\App Projects\xyzreader\XYZReader\build\outputs\apk\XYZReader-debug.apk"
             type="MAIN" />
     </build>
-    <build timestamp="429382969160755" >
+    <build
+        timestamp="443866441596973"
+        verifier="COMPATIBLE" >
         <artifact
-            location="C:\Users\Gabe\Desktop\App Projects\xyzreader\XYZReader\build\intermediates\transforms\dex\debug\folders\1000\5\slice_1\classes.dex"
-            type="DEX" />
+            location="C:\Users\Gabe\Desktop\App Projects\xyzreader\XYZReader\build\intermediates\reload-dex\debug\classes.dex"
+            type="RELOAD_DEX" />
     </build>
 
 </instant-run>
