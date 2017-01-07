@@ -18,10 +18,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
@@ -221,23 +223,25 @@ public class ArticleListActivity extends ActionBarActivity implements
 
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, ItemsContract.Items.buildItemUri(mItemPosition));
+
+            Toast.makeText(ArticleListActivity.this, "CLICKED", Toast.LENGTH_LONG).show();
+
+//            Intent intent = new Intent(Intent.ACTION_VIEW, ItemsContract.Items.buildItemUri(mItemPosition));
+            Intent intent = new Intent(ArticleListActivity.this, ArticleDetailActivity.class);
 
             intent.putExtra(EXTRA_STARTING_POSITION, mItemPosition);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (!mIsDetailsActivityStarted) {
-                    mIsDetailsActivityStarted = true;
+                mIsDetailsActivityStarted = true;
 
-                    String transitionName = "transition_name_" + mItemPosition;
+                String transitionName = "transition_name_" + mItemPosition;
 
-                    Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
-                            ArticleListActivity.this,
-                            thumbnailView,
-                            transitionName)
-                            .toBundle();
-                    startActivity(intent, bundle);
-                }
+                Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+                        ArticleListActivity.this,
+                        thumbnailView,
+                        transitionName)
+                        .toBundle();
+                startActivity(intent, bundle);
             } else {
                 startActivity(intent);
             }
